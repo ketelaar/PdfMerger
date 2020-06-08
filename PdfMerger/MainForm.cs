@@ -1,9 +1,9 @@
-﻿using System;
-using System.Windows.Forms;
-using System.IO;
-using PdfMerger.Objects;
+﻿using PdfMerger.Objects;
 using PdfSharp.Pdf;
 using PdfSharp.Pdf.IO;
+using System;
+using System.IO;
+using System.Windows.Forms;
 
 namespace PdfMerger
 {
@@ -47,7 +47,7 @@ namespace PdfMerger
                 foreach (String file in openFileDialog.FileNames)
                 {
                     FileList.Items.Add(new PdfEntry(file));
-                }        
+                }
             }
 
 
@@ -129,7 +129,7 @@ namespace PdfMerger
                 output.Save(saveFileDialog.FileName);
 
                 MessageBox.Show("Succesfully saved " + Path.GetFileName(saveFileDialog.FileName));
-            }            
+            }
         }
     }
 }
