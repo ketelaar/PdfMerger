@@ -23,7 +23,7 @@ namespace PdfMerger
 
         private void Add_Click(object sender, EventArgs e)
         {
-            OpenFileDialog openFileDialog = new OpenFileDialog
+            var openFileDialog = new OpenFileDialog
             {
                 InitialDirectory = Directory.GetCurrentDirectory(),
                 Title = "Select PDF files to merge",
@@ -42,12 +42,11 @@ namespace PdfMerger
                 Multiselect = true
             };
 
-            if (openFileDialog.ShowDialog() == DialogResult.OK)
+            if (openFileDialog.ShowDialog() != DialogResult.OK) return;
+
+            foreach (var file in openFileDialog.FileNames)
             {
-                foreach (String file in openFileDialog.FileNames)
-                {
-                    FileList.Items.Add(new PdfEntry(file));
-                }
+                FileList.Items.Add(new PdfEntry(file));
             }
 
 
@@ -60,48 +59,47 @@ namespace PdfMerger
 
         private void MoveTop_Click(object sender, EventArgs e)
         {
-            object File = FileList.SelectedItem;
-            FileList.Items.Remove(File);
-            FileList.Items.Insert(0, File);
+            var file = FileList.SelectedItem;
+            FileList.Items.Remove(file);
+            FileList.Items.Insert(0, file);
             FileList.SetSelected(0, true);
         }
 
         private void MoveBottom_Click(object sender, EventArgs e)
         {
-            object File = FileList.SelectedItem;
-            FileList.Items.Remove(File);
-            FileList.Items.Insert(FileList.Items.Count - 1, File);
+            var file = FileList.SelectedItem;
+            FileList.Items.Remove(file);
+            FileList.Items.Insert(FileList.Items.Count - 1, file);
             FileList.SetSelected(FileList.Items.Count - 1, true);
         }
 
         private void MoveUp_Click(object sender, EventArgs e)
         {
-            int NewIndex = FileList.SelectedIndex - 1;
+            var newIndex = FileList.SelectedIndex - 1;
             // if the new index is not invalid then continue, else do nothing
-            if (!(NewIndex < 0))
-            {
-                object File = FileList.SelectedItem;
-                FileList.Items.Remove(File);
-                FileList.Items.Insert(NewIndex, File);
-                FileList.SetSelected(NewIndex, true);
-            }
+            if (newIndex < 0) return;
+
+            var file = FileList.SelectedItem;
+            FileList.Items.Remove(file);
+            FileList.Items.Insert(newIndex, file);
+            FileList.SetSelected(newIndex, true);
         }
 
         private void MoveDown_Click(object sender, EventArgs e)
         {
-            int NewIndex = FileList.SelectedIndex + 1;
-            if (!(NewIndex >= FileList.Items.Count))
-            {
-                object File = FileList.SelectedItem;
-                FileList.Items.Remove(File);
-                FileList.Items.Insert(NewIndex, File);
-                FileList.SetSelected(NewIndex, true);
-            }
+            var newIndex = FileList.SelectedIndex + 1;
+
+            if (newIndex >= FileList.Items.Count) return;
+
+            var file = FileList.SelectedItem;
+            FileList.Items.Remove(file);
+            FileList.Items.Insert(newIndex, file);
+            FileList.SetSelected(newIndex, true);
         }
 
         private void Merge_Click(object sender, EventArgs e)
         {
-            SaveFileDialog saveFileDialog = new SaveFileDialog
+            var saveFileDialog = new SaveFileDialog
             {
                 InitialDirectory = Directory.GetCurrentDirectory(),
                 Title = "Select where you want to save your PDF",
@@ -114,22 +112,21 @@ namespace PdfMerger
                 RestoreDirectory = true
             };
 
-            if (saveFileDialog.ShowDialog() == DialogResult.OK)
+            if (saveFileDialog.ShowDialog() != DialogResult.OK) return;
+
+            var output = new PdfDocument();
+            foreach (PdfEntry file in FileList.Items)
             {
-                PdfDocument output = new PdfDocument();
-                foreach (PdfEntry File in FileList.Items)
+                var newPdf = PdfReader.Open(file.FilePath, PdfDocumentOpenMode.Import);
+                for (var i = 0; i < newPdf.PageCount; i++)
                 {
-                    PdfDocument newPdf = PdfReader.Open(File.FilePath, PdfDocumentOpenMode.Import);
-                    for (int i = 0; i < newPdf.PageCount; i++)
-                    {
-                        output.AddPage(newPdf.Pages[i]);
-                    }
+                    output.AddPage(newPdf.Pages[i]);
                 }
-
-                output.Save(saveFileDialog.FileName);
-
-                MessageBox.Show("Succesfully saved " + Path.GetFileName(saveFileDialog.FileName));
             }
+
+            output.Save(saveFileDialog.FileName);
+
+            MessageBox.Show("Successfully saved " + Path.GetFileName(saveFileDialog.FileName));
         }
     }
 }
