@@ -1,16 +1,15 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 
 namespace PdfMerger.Objects
 {
     public class PdfEntry
     {
-        public String FilePath { get; }
-        private String Name { get; }
+        public string FilePath { get; }
+        private string Name { get; }
 
-        public PdfEntry(String path)
+        public PdfEntry(string path)
         {
-            this.FilePath = path;
+            FilePath = path;
 
             Name = Path.GetFileName(path);
         }
