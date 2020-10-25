@@ -1,4 +1,4 @@
-﻿using PdfMerger.Objects;
+using PdfMerger.Objects;
 using PdfSharp.Pdf;
 using PdfSharp.Pdf.IO;
 using System;
@@ -52,13 +52,18 @@ namespace PdfMerger
 
         }
 
+        private bool IsIndexValid(ListBox lb) => lb.SelectedIndex >= 0;
+
         private void Remove_Click(object sender, EventArgs e)
         {
-            FileList.Items.RemoveAt(FileList.SelectedIndex);
+            if (IsIndexValid(FileList))
+                FileList.Items.RemoveAt(FileList.SelectedIndex);
         }
 
         private void MoveTop_Click(object sender, EventArgs e)
         {
+            if (! IsIndexValid(FileList)) return;
+            
             var file = FileList.SelectedItem;
             FileList.Items.Remove(file);
             FileList.Items.Insert(0, file);
@@ -67,6 +72,8 @@ namespace PdfMerger
 
         private void MoveBottom_Click(object sender, EventArgs e)
         {
+            if (!IsIndexValid(FileList)) return;
+
             var file = FileList.SelectedItem;
             FileList.Items.Remove(file);
             FileList.Items.Insert(FileList.Items.Count - 1, file);
@@ -99,6 +106,12 @@ namespace PdfMerger
 
         private void Merge_Click(object sender, EventArgs e)
         {
+            if (FileList.Items.Count==0)
+            {
+                MessageBox.Show("Select at least 2 pdf files", "CANNOT MERGE", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
             var saveFileDialog = new SaveFileDialog
             {
                 InitialDirectory = Directory.GetCurrentDirectory(),
